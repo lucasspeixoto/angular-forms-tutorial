@@ -9,6 +9,8 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { newUserForm } from '../constants/new-user-form';
+import { CustomValidationMessagesComponent } from '../../../components/custom-validation-messages/custom-validation-messages.component';
 
 @Component({
   selector: 'app-new-way-form',
@@ -19,6 +21,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     NzFormModule,
     NzInputModule,
     NzSelectModule,
+    CustomValidationMessagesComponent,
   ],
   template: `
     <form nz-form [formGroup]="newUserForm" (ngSubmit)="submitForm()">
@@ -28,13 +31,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         >
         <nz-form-control [nzSm]="14" [nzXs]="24">
           <input nz-input formControlName="email" id="email" />
-          @if(newUserForm.get('email')?.hasError('required') &&
-          newUserForm.get('email')?.dirty) {
-          <span class="error-message">&#9888; Campo obrigatório!</span>
-          } @if(newUserForm.get('email')?.hasError('email') &&
-          newUserForm.get('email')?.dirty) {
-          <span class="error-message">&#9888; E-mail inválido!</span>
-          }
+          <app-custom-validation-messages controlName="email" />
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
@@ -48,15 +45,10 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
             id="password"
             formControlName="password"
           />
-          @if(newUserForm.get('password')?.hasError('required') &&
-          newUserForm.get('password')?.dirty) {
-          <span class="error-message">&#9888; Campo obrigatório!</span>
-          } @if(newUserForm.get('password')?.hasError('minlength') &&
-          newUserForm.get('password')?.dirty) {
-          <span class="error-message"
-            >&#9888; Senha deve conter no mínimo 3 caracteres!</span
-          >
-          }
+          <app-custom-validation-messages
+            controlName="password"
+            [minLength]="3"
+          />
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
@@ -70,10 +62,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         </nz-form-label>
         <nz-form-control [nzSm]="14" [nzXs]="24">
           <input nz-input id="nickname" formControlName="nickname" />
-          @if(newUserForm.get('nickname')?.hasError('required') &&
-          newUserForm.get('nickname')?.dirty) {
-          <span class="error-message">&#9888; Campo obrigatório!</span>
-          }
+          <app-custom-validation-messages controlName="nickname" />
         </nz-form-control>
       </nz-form-item>
       <nz-form-item nz-row class="register-area">
@@ -118,17 +107,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
   ],
 })
 export class NewWayFormComponent {
-  private fb = inject(UntypedFormBuilder);
-
-  public newUserForm = this.fb.group({
-    email: this.fb.control('', [Validators.email, Validators.required]),
-    password: this.fb.control('', [
-      Validators.required,
-      Validators.minLength(3),
-    ]),
-    nickname: this.fb.control('', [Validators.required]),
-    agree: this.fb.control(false),
-  });
+  public newUserForm = newUserForm();
 
   public submitForm(): void {
     if (this.newUserForm.valid) {
